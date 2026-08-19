@@ -1,0 +1,10 @@
+# Build artifacts
+monitor.exe
+*.exe
+
+# Runtime data (SQLite databases created by running the monitor)
+*.db
+
+# Claude Code project notes - kept local, not part of the repo
+CLAUDE.md
+.claude/

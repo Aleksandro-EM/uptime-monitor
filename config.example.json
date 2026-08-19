@@ -1,0 +1,10 @@
+{
+	"urls": ["https://example.com", "https://httpbin.org/status/500"],
+	"timeout": "5s",
+	"interval": "30s",
+	"fail_threshold": 3,
+	"db": "monitor.db",
+	"webhook": "",
+	"listen": ":8080",
+	"headers": {}
+}
