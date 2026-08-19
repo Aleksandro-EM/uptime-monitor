@@ -50,7 +50,8 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           ./monitor \
-            -urls "https://www.kinoklik.ca,http://54.85.246.30" \
+            -urls "https://www.kinoklik.ca,http://54.85.246.30,https://thisdomaindoesnotexist12345.com" \
+            -fail-threshold 1 \
             -webhook "${DISCORD_WEBHOOK_URL}" \
             -db monitor.db
 
