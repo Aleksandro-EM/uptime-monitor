@@ -1,0 +1,58 @@
+name: KinoKlik Uptime Monitor
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      # Consecutive-failure state is persisted to a dedicated "state" branch
+      # (a fresh orphan commit every run, never accumulating history) rather
+      # than the default branch, since GitHub Actions runners are ephemeral
+      # and monitor.db would otherwise reset to empty on every run, and
+      # committing it to master would spam the visible commit history every
+      # 5 minutes.
+      - name: Restore previous state
+        run: |
+          git fetch origin state 2>/dev/null || true
+          git show origin/state:monitor.db > monitor.db 2>/dev/null || echo "no prior state, starting fresh"
+
+      - name: Build monitor
+        run: go build -o monitor ./cmd/monitor
+
+      # Exit code 1 (a target is down) is expected and shouldn't fail the
+      # job, since that would skip the state-saving step below. Discord is
+      # the actual alerting channel; this job's own pass/fail status is not.
+      - name: Run checks
+        continue-on-error: true
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          HEALTH_CHECK_KEY: ${{ secrets.HEALTH_CHECK_KEY }}
+        run: |
+          ./monitor \
+            -urls "https://kinoklik.ca,http://54.85.246.30,https://kinoklik.ca/health" \
+            -header "X-Health-Key: ${HEALTH_CHECK_KEY}" \
+            -webhook "${DISCORD_WEBHOOK_URL}" \
+            -db monitor.db
+
+      - name: Save state
+        run: |
+          git config user.name "kinoklik-monitor-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout --orphan state-tmp
+          git rm -rf --cached . >/dev/null
+          git add monitor.db
+          git commit -m "state update"
+          git push origin state-tmp:state --force
