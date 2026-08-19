@@ -42,7 +42,7 @@ jobs:
           HEALTH_CHECK_KEY: ${{ secrets.HEALTH_CHECK_KEY }}
         run: |
           ./monitor \
-            -urls "https://kinoklik.ca,http://54.85.246.30,https://kinoklik.ca/health" \
+            -urls "https://www.kinoklik.ca,http://54.85.246.30,https://www.kinoklik.ca/health" \
             -header "X-Health-Key: ${HEALTH_CHECK_KEY}" \
             -webhook "${DISCORD_WEBHOOK_URL}" \
             -db monitor.db
@@ -53,6 +53,6 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git checkout --orphan state-tmp
           git rm -rf --cached . >/dev/null
-          git add monitor.db
+          git add -f monitor.db
           git commit -m "state update"
           git push origin state-tmp:state --force
