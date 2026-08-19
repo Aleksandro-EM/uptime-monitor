@@ -35,15 +35,22 @@ jobs:
       # Exit code 1 (a target is down) is expected and shouldn't fail the
       # job, since that would skip the state-saving step below. Discord is
       # the actual alerting channel; this job's own pass/fail status is not.
+      # /health is deliberately not in -urls yet: the server-side route is
+      # still pending team review/approval and hasn't been deployed to
+      # production. Checking it before then would be actively misleading,
+      # not just unused: the unmatched route falls through to the SPA's
+      # catch-all handler and always returns 200, so it would silently
+      # report "healthy" no matter what's actually wrong. Add
+      # "https://www.kinoklik.ca/health" back to -urls (and restore the
+      # -header line below) once /health is live in production and
+      # HEALTH_CHECK_KEY is set in prod Secrets Manager.
       - name: Run checks
         continue-on-error: true
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          HEALTH_CHECK_KEY: ${{ secrets.HEALTH_CHECK_KEY }}
         run: |
           ./monitor \
-            -urls "https://www.kinoklik.ca,http://54.85.246.30,https://www.kinoklik.ca/health" \
-            -header "X-Health-Key: ${HEALTH_CHECK_KEY}" \
+            -urls "https://www.kinoklik.ca,http://54.85.246.30" \
             -webhook "${DISCORD_WEBHOOK_URL}" \
             -db monitor.db
 
