@@ -75,7 +75,7 @@ jobs:
           payload=$(jq -n \
             --arg title "Uptime monitor pipeline failed" \
             --arg desc "The monitor job itself errored (not a target outage -- that is alerted separately by the monitor binary).
-[View run]($RUN_URL)" \
+            [View run]($RUN_URL)" \
             --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             '{embeds: [{title: $title, description: $desc, color: 15548997, timestamp: $ts}]}')
           curl -sf -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "$payload"
