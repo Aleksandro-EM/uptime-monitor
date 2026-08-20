@@ -42,7 +42,7 @@ jobs:
           HEALTH_CHECK_KEY: ${{ secrets.HEALTH_CHECK_KEY }}
         run: |
           ./monitor \
-            -urls "https://www.kinoklik.ca,http://54.85.246.30,https://www.kinoklik.ca/health" \
+            -urls "https://www.kinoklik.ca,https://www.kinoklik.ca/health" \
             -header "X-Health-Key: ${HEALTH_CHECK_KEY}" \
             -webhook "${DISCORD_WEBHOOK_URL}" \
             -db monitor.db
