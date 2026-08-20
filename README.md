@@ -2,8 +2,6 @@
 
 A concurrent uptime/health-check monitor written in Go. It checks a list of HTTP targets in parallel and reports whether each is up or down, along with response latency.
 
-This is a skill-building project — a way to practice Go's concurrency model (goroutines, channels) and standard library (`net/http`) by building something a real tool actually needs: a mini status checker in the spirit of Uptime Kuma.
-
 ## Requirements
 
 - Go 1.26+
